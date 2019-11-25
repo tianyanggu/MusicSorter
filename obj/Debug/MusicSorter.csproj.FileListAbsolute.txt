@@ -1,0 +1,15 @@
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.csprojAssemblyReference.cache
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.MainForm.resources
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.Properties.Resources.resources
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.csproj.GenerateResource.cache
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\MusicSorter.exe.config
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\MusicSorter.exe
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\MusicSorter.pdb
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\NAudio.dll
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\NAudio.xml
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.csproj.CopyComplete
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.exe
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\obj\Debug\MusicSorter.pdb
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\TagLibSharp.dll
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\TagLibSharp.pdb
+C:\Users\Tianyang\Documents\GitHub\MusicSorter\MusicSorter\bin\Debug\TagLibSharp.xml
