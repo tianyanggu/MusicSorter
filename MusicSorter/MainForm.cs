@@ -25,6 +25,11 @@ namespace MusicSorter
             InitializeComponent();
         }
 
+        //TODO track bar
+        //TODO help shortcuts
+        //TODO icon
+        //TODO stop deleted song from playing twice (keep track of all words and then if 100% match then stop it), show as yellow in right and is skipped
+
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
             try
@@ -41,7 +46,7 @@ namespace MusicSorter
             {
                 MessageBox.Show(ex.Message);
             }
-}
+        }
 
         private void textBoxMusicFolder_Leave(object sender, EventArgs e)
         {
@@ -66,6 +71,7 @@ namespace MusicSorter
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void listBoxSongs_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
@@ -75,6 +81,107 @@ namespace MusicSorter
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            try
+            {
+                int i;
+                if (int.TryParse(e.KeyChar.ToString(), out i))
+                {
+                    MoveSongPosition(i);
+                }
+                else if (e.KeyChar == ' ')
+                {
+                    TogglePlay();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void buttonNext_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                NextSong();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void buttonPrev_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                PrevSong();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Down:
+                        NextSong();
+                        break;
+                    case Keys.Up:
+                        PrevSong();
+                        break;
+                    case Keys.Left:
+                        SkipSongPosition(-1);
+                        break;
+                    case Keys.Right:
+                        SkipSongPosition(1);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var selectedSong = Convert.ToString(listBoxSongs.SelectedItem);
+                var fileLocation = Path.Combine(textBoxMusicFolder.Text, selectedSong);
+                if (File.Exists(fileLocation))
+                {
+                    NextSong();
+                    FileSystem.DeleteFile(fileLocation, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void listBoxSongs_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Right
+                || e.KeyCode == Keys.Left
+                || e.KeyCode == Keys.Up
+                || e.KeyCode == Keys.Down)
+            {
+                e.Handled = true;
             }
         }
 
@@ -155,25 +262,6 @@ namespace MusicSorter
             }
         }
 
-        private void MainForm_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            try
-            {
-                int i;
-                if (int.TryParse(e.KeyChar.ToString(), out i))
-                {
-                    MoveSongPosition(i);
-                }
-                else if (e.KeyChar == ' ')
-                {
-                    TogglePlay();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
         private void MoveSongPosition(int i)
         {
             var segment = AudioFile.Length / 10;
@@ -189,11 +277,6 @@ namespace MusicSorter
             }
         }
 
-        private void buttonNext_Click(object sender, EventArgs e)
-        {
-            NextSong();
-        }
-
         private void NextSong()
         {
             if (listBoxSongs.SelectedIndex < listBoxSongs.Items.Count - 1)
@@ -203,68 +286,12 @@ namespace MusicSorter
             }
         }
 
-        private void buttonPrev_Click(object sender, EventArgs e)
-        {
-            PrevSong();
-        }
-
         private void PrevSong()
         {
             if (listBoxSongs.SelectedIndex > 0)
             {
                 listBoxSongs.SelectedIndex--;
                 OutputDevice.Play();
-            }
-        }
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch(e.KeyCode)
-            {
-                case Keys.Down:
-                    NextSong();
-                    break;
-                case Keys.Up:
-                    PrevSong();
-                    break;
-                case Keys.Left:
-                    SkipSongPosition(-1);
-                    break;
-                case Keys.Right:
-                    SkipSongPosition(1);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        private void buttonDelete_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var selectedSong = Convert.ToString(listBoxSongs.SelectedItem);
-                var fileLocation = Path.Combine(textBoxMusicFolder.Text, selectedSong);
-                if (File.Exists(fileLocation))
-                {
-                    NextSong();
-                    FileSystem.DeleteFile(fileLocation, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void listBoxSongs_KeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.KeyCode == Keys.Right 
-                || e.KeyCode == Keys.Left
-                || e.KeyCode == Keys.Up 
-                || e.KeyCode == Keys.Down)
-            {
-                e.Handled = true;
             }
         }
     }
