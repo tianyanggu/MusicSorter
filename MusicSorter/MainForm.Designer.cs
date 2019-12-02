@@ -43,6 +43,7 @@
             this.trackBarSong = new System.Windows.Forms.TrackBar();
             this.labelCurrentTime = new System.Windows.Forms.Label();
             this.labelTotalTime = new System.Windows.Forms.Label();
+            this.labelResponse = new System.Windows.Forms.Label();
             this.groupBoxSongList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSong)).BeginInit();
@@ -51,7 +52,7 @@
             // buttonDelete
             // 
             this.buttonDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonDelete.Location = new System.Drawing.Point(900, 812);
+            this.buttonDelete.Location = new System.Drawing.Point(115, 812);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(97, 32);
             this.buttonDelete.TabIndex = 10;
@@ -223,11 +224,23 @@
             this.labelTotalTime.Text = "00:00";
             this.labelTotalTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // labelResponse
+            // 
+            this.labelResponse.AutoSize = true;
+            this.labelResponse.ForeColor = System.Drawing.Color.Green;
+            this.labelResponse.Location = new System.Drawing.Point(218, 818);
+            this.labelResponse.Name = "labelResponse";
+            this.labelResponse.Size = new System.Drawing.Size(82, 20);
+            this.labelResponse.TabIndex = 16;
+            this.labelResponse.Text = "Response";
+            this.labelResponse.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1517, 856);
+            this.Controls.Add(this.labelResponse);
             this.Controls.Add(this.labelTotalTime);
             this.Controls.Add(this.labelCurrentTime);
             this.Controls.Add(this.trackBarSong);
@@ -272,6 +285,7 @@
         private System.Windows.Forms.TrackBar trackBarSong;
         private System.Windows.Forms.Label labelCurrentTime;
         private System.Windows.Forms.Label labelTotalTime;
+        private System.Windows.Forms.Label labelResponse;
     }
 }
 

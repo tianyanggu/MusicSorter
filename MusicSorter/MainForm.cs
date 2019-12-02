@@ -48,8 +48,8 @@ namespace MusicSorter
         }
 
         //TODO icon
-        //TODO reponse label for successfully saving and deleting
 
+        #region events
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
             try
@@ -177,11 +177,20 @@ namespace MusicSorter
             {
                 Rater.SaveSongRatings();
                 Rater.SongsRatingsUpdated = false;
+                DisplayResponseMessage("Saved!");
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void ResponseTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            this.Invoke(new Action(() =>
+            {
+                labelResponse.Visible = false;
+            }));
         }
 
         private void buttonFilter_Click(object sender, EventArgs e)
@@ -203,6 +212,8 @@ namespace MusicSorter
                         }
                     }
                 }
+
+                DisplayResponseMessage("Filtered!");
             }
             catch (Exception ex)
             {
@@ -267,6 +278,22 @@ namespace MusicSorter
             AudioFile.Position = AudioFile.Position = (long)(AudioFile.Length * percent);
         }
 
+        private void SongTimer_Tick(object sender, EventArgs e)
+        {
+            labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+            trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
+        }
+
+        private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            if (AudioFile.Position == AudioFile.Length)
+            {
+                NextSong();
+            }
+        }
+        #endregion
+
+        #region private methods
         private void UpdateRating(int pos, int rating)
         {
             var formattedName = GetFormattedName(CurrentSong);
@@ -289,6 +316,17 @@ namespace MusicSorter
             {
                 listViewSongs.Items[pos].BackColor = Color.Salmon;
             }
+        }
+
+        private void DisplayResponseMessage(string msg)
+        {
+            labelResponse.Text = msg;
+            labelResponse.Visible = true;
+
+            System.Timers.Timer responseTimer = new System.Timers.Timer();
+            responseTimer.Interval = 2000;
+            responseTimer.Elapsed += ResponseTimer_Elapsed;
+            responseTimer.Enabled = true;
         }
 
         private void PopulateSongs(string folder)
@@ -413,20 +451,6 @@ namespace MusicSorter
             }
         }
 
-        private void SongTimer_Tick(object sender, EventArgs e)
-        {
-            labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
-            trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
-        }
-
-        private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
-        {
-            if (AudioFile.Position == AudioFile.Length)
-            {
-                NextSong();
-            }
-        }
-
         private string GetSongFileLocation(string selectedSong)
         {
             var fileLocation = Path.Combine(textBoxMusicFolder.Text, selectedSong);
@@ -461,6 +485,7 @@ namespace MusicSorter
             }
         }
 
+        #region moving track position and switching songs
         private void MoveSongPosition(int i)
         {
             var segment = AudioFile.Length / 10;
@@ -513,5 +538,7 @@ namespace MusicSorter
                 }
             }
         }
+        #endregion
+        #endregion
     }
 }
