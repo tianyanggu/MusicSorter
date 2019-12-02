@@ -49,9 +49,8 @@ namespace MusicSorter
             }
         }
 
-        //TODO icon
-
         #region events
+        #region UI Events
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
             try
@@ -193,14 +192,6 @@ namespace MusicSorter
             }
         }
 
-        private void ResponseTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            this.Invoke(new Action(() =>
-            {
-                labelResponse.Visible = false;
-            }));
-        }
-
         private void buttonFilter_Click(object sender, EventArgs e)
         {
             try
@@ -278,13 +269,26 @@ namespace MusicSorter
             HelpForm form = new HelpForm();
             form.ShowDialog();
         }
-
+        private void buttonMode_Click(object sender, EventArgs e)
+        {
+            if (Mode == PlaybackMode.FastSorting)
+            {
+                Mode = PlaybackMode.Normal;
+                buttonMode.Text = "Playback";
+            }
+            else
+            {
+                Mode = PlaybackMode.FastSorting;
+                buttonMode.Text = "Fast Sort";
+            }
+        }
         private void trackBarSong_MouseDown(object sender, MouseEventArgs e)
         {
             var percent = Decimal.Divide(e.X, trackBarSong.Width);
             trackBarSong.Value = Convert.ToInt32(percent * trackBarSong.Maximum);
             AudioFile.Position = AudioFile.Position = (long)(AudioFile.Length * percent);
         }
+        #endregion
 
         private void SongTimer_Tick(object sender, EventArgs e)
         {
@@ -300,18 +304,12 @@ namespace MusicSorter
             }
         }
 
-        private void buttonMode_Click(object sender, EventArgs e)
+        private void ResponseTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (Mode == PlaybackMode.FastSorting)
+            this.Invoke(new Action(() =>
             {
-                Mode = PlaybackMode.Normal;
-                buttonMode.Text = "Playback";
-            }
-            else
-            {
-                Mode = PlaybackMode.FastSorting;
-                buttonMode.Text = "Fast Sort";
-            }
+                labelResponse.Visible = false;
+            }));
         }
         #endregion
 
