@@ -40,8 +40,12 @@
             this.pictureBoxAlbumArt = new System.Windows.Forms.PictureBox();
             this.buttonHelp = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
+            this.trackBarSong = new System.Windows.Forms.TrackBar();
+            this.labelCurrentTime = new System.Windows.Forms.Label();
+            this.labelTotalTime = new System.Windows.Forms.Label();
             this.groupBoxSongList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarSong)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonDelete
@@ -143,10 +147,10 @@
             // 
             this.textBoxCurrentSong.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxCurrentSong.Location = new System.Drawing.Point(12, 780);
+            this.textBoxCurrentSong.Location = new System.Drawing.Point(212, 741);
             this.textBoxCurrentSong.Name = "textBoxCurrentSong";
             this.textBoxCurrentSong.ReadOnly = true;
-            this.textBoxCurrentSong.Size = new System.Drawing.Size(1088, 26);
+            this.textBoxCurrentSong.Size = new System.Drawing.Size(688, 26);
             this.textBoxCurrentSong.TabIndex = 6;
             this.textBoxCurrentSong.TabStop = false;
             // 
@@ -157,7 +161,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBoxAlbumArt.Location = new System.Drawing.Point(12, 12);
             this.pictureBoxAlbumArt.Name = "pictureBoxAlbumArt";
-            this.pictureBoxAlbumArt.Size = new System.Drawing.Size(1088, 762);
+            this.pictureBoxAlbumArt.Size = new System.Drawing.Size(1088, 723);
             this.pictureBoxAlbumArt.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxAlbumArt.TabIndex = 7;
             this.pictureBoxAlbumArt.TabStop = false;
@@ -186,11 +190,47 @@
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
+            // trackBarSong
+            // 
+            this.trackBarSong.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBarSong.AutoSize = false;
+            this.trackBarSong.LargeChange = 1;
+            this.trackBarSong.Location = new System.Drawing.Point(12, 773);
+            this.trackBarSong.Maximum = 100;
+            this.trackBarSong.Name = "trackBarSong";
+            this.trackBarSong.Size = new System.Drawing.Size(1088, 33);
+            this.trackBarSong.TabIndex = 13;
+            this.trackBarSong.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.trackBarSong.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trackBarSong_MouseDown);
+            // 
+            // labelCurrentTime
+            // 
+            this.labelCurrentTime.Location = new System.Drawing.Point(12, 744);
+            this.labelCurrentTime.Name = "labelCurrentTime";
+            this.labelCurrentTime.Size = new System.Drawing.Size(194, 23);
+            this.labelCurrentTime.TabIndex = 14;
+            this.labelCurrentTime.Text = "00:00";
+            this.labelCurrentTime.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // labelTotalTime
+            // 
+            this.labelTotalTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelTotalTime.Location = new System.Drawing.Point(906, 744);
+            this.labelTotalTime.Name = "labelTotalTime";
+            this.labelTotalTime.Size = new System.Drawing.Size(194, 20);
+            this.labelTotalTime.TabIndex = 15;
+            this.labelTotalTime.Text = "00:00";
+            this.labelTotalTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1517, 856);
+            this.Controls.Add(this.labelTotalTime);
+            this.Controls.Add(this.labelCurrentTime);
+            this.Controls.Add(this.trackBarSong);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.buttonHelp);
             this.Controls.Add(this.pictureBoxAlbumArt);
@@ -209,6 +249,7 @@
             this.groupBoxSongList.ResumeLayout(false);
             this.groupBoxSongList.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarSong)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -228,6 +269,9 @@
         private System.Windows.Forms.ListView listViewSongs;
         private System.Windows.Forms.Button buttonHelp;
         private System.Windows.Forms.Button buttonSave;
+        private System.Windows.Forms.TrackBar trackBarSong;
+        private System.Windows.Forms.Label labelCurrentTime;
+        private System.Windows.Forms.Label labelTotalTime;
     }
 }
 

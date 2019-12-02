@@ -21,7 +21,8 @@ namespace MusicSorter
         private string CurrentSong { get; set; }
         private WaveOutEvent OutputDevice { get; set; }
         private AudioFileReader AudioFile { get; set; }
-        private SongRater songRater { get; set; }
+        private Timer SongTimer { get; set; }
+        private SongRater Rater { get; set; }
 
 
         private int AcceptableRating = 5;
@@ -36,8 +37,8 @@ namespace MusicSorter
         {
             try
             {
-                songRater = new SongRater();
-                textBoxMusicFolder.Text = songRater.PreviousFolder;
+                Rater = new SongRater();
+                textBoxMusicFolder.Text = Rater.PreviousFolder;
                 PopulateSongs(textBoxMusicFolder.Text);
             }
             catch (Exception ex)
@@ -46,7 +47,6 @@ namespace MusicSorter
             }
         }
 
-        //TODO track bar
         //TODO icon
         //TODO reponse label for successfully saving and deleting
 
@@ -73,7 +73,7 @@ namespace MusicSorter
             try
             {
                 PopulateSongs(textBoxMusicFolder.Text);
-                songRater.PreviousFolder = textBoxMusicFolder.Text;
+                Rater.PreviousFolder = textBoxMusicFolder.Text;
             }
             catch (Exception ex)
             {
@@ -175,8 +175,8 @@ namespace MusicSorter
         {
             try
             {
-                songRater.SaveSongRatings();
-                songRater.SongsRatingsUpdated = false;
+                Rater.SaveSongRatings();
+                Rater.SongsRatingsUpdated = false;
             }
             catch (Exception ex)
             {
@@ -191,8 +191,8 @@ namespace MusicSorter
                 for (int i = 0; i < listViewSongs.Items.Count; i++)
                 {
                     var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                    if (songRater.SongRatings.ContainsKey(formattedName)
-                        && songRater.SongRatings[formattedName] < AcceptableRating)
+                    if (Rater.SongRatings.ContainsKey(formattedName)
+                        && Rater.SongRatings[formattedName] < AcceptableRating)
                     {
                         var selectedSong = listViewSongs.Items[i].Text;
                         var fileLocation = Path.Combine(textBoxMusicFolder.Text, selectedSong);
@@ -230,12 +230,12 @@ namespace MusicSorter
         {
             try
             {
-                if (songRater.SongsRatingsUpdated)
+                if (Rater.SongsRatingsUpdated)
                 {
                     var dr = MessageBox.Show("Do you want to save your unsaved rating changes?", "Confirmation", MessageBoxButtons.YesNoCancel);
                     if (dr == DialogResult.Yes)
                     {
-                        songRater.SaveSongRatings();
+                        Rater.SaveSongRatings();
                     }
                     else if (dr == DialogResult.Cancel)
                     {
@@ -260,11 +260,18 @@ namespace MusicSorter
             form.ShowDialog();
         }
 
+        private void trackBarSong_MouseDown(object sender, MouseEventArgs e)
+        {
+            var percent = Decimal.Divide(e.X, trackBarSong.Width);
+            trackBarSong.Value = Convert.ToInt32(percent * trackBarSong.Maximum);
+            AudioFile.Position = AudioFile.Position = (long)(AudioFile.Length * percent);
+        }
+
         private void UpdateRating(int pos, int rating)
         {
             var formattedName = GetFormattedName(CurrentSong);
-            songRater.UpdateRating(formattedName, rating);
-            songRater.SongsRatingsUpdated = true;
+            Rater.UpdateRating(formattedName, rating);
+            Rater.SongsRatingsUpdated = true;
             UpdateColor(pos, rating);
         }
 
@@ -302,9 +309,9 @@ namespace MusicSorter
                     var songFileName = listViewSongs.Items[i].Text;
                     var formattedName = GetFormattedName(songFileName);
 
-                    if (songRater.SongRatings.ContainsKey(formattedName))
+                    if (Rater.SongRatings.ContainsKey(formattedName))
                     {
-                        var rating = songRater.SongRatings[formattedName];
+                        var rating = Rater.SongRatings[formattedName];
                         UpdateColor(i, rating);
                     }
                 }
@@ -315,8 +322,8 @@ namespace MusicSorter
                     for (int i = 0; i < listViewSongs.Items.Count; i++)
                     {
                         var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                        if (!songRater.SongRatings.ContainsKey(formattedName)
-                            || songRater.SongRatings[formattedName] >= AcceptableRating)
+                        if (!Rater.SongRatings.ContainsKey(formattedName)
+                            || Rater.SongRatings[formattedName] >= AcceptableRating)
                         {
                             listViewSongs.Items[i].Selected = true;
                             LoadSong(listViewSongs.SelectedItems[0].Text);
@@ -344,11 +351,11 @@ namespace MusicSorter
                         {
                             performers[i] = performers[i].Trim();
                         }
-                        return songRater.FormatSongName(string.Join(", ", performers), file.Tag.Title);
+                        return Rater.FormatSongName(string.Join(", ", performers), file.Tag.Title);
                     }
                 }
             }
-            return songRater.FormatSongName(songFileName);
+            return Rater.FormatSongName(songFileName);
         }
 
         private void LoadSong(string selectedSong)
@@ -368,9 +375,21 @@ namespace MusicSorter
                 {
                     AudioFile.Dispose();
                 }
+                if (SongTimer != null)
+                {
+                    SongTimer.Dispose();
+                }
 
                 AudioFile = new AudioFileReader(fileLocation);
                 OutputDevice = new WaveOutEvent();
+                SongTimer = new Timer();
+
+                SongTimer.Interval = 1000;
+                SongTimer.Tick += SongTimer_Tick;
+                SongTimer.Enabled = true;
+                labelTotalTime.Text = AudioFile.TotalTime.ToString("hh\\:mm\\:ss");
+                trackBarSong.Maximum = (int)AudioFile.TotalTime.TotalSeconds;
+
                 OutputDevice.Init(AudioFile);
                 OutputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
                 CurrentSong = selectedSong;
@@ -392,6 +411,12 @@ namespace MusicSorter
                 textBoxCurrentSong.Text = "Audio file type is not supported.";
                 CurrentSong = string.Empty;
             }
+        }
+
+        private void SongTimer_Tick(object sender, EventArgs e)
+        {
+            labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+            trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
         }
 
         private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
@@ -461,8 +486,8 @@ namespace MusicSorter
                 while (++i < listViewSongs.Items.Count)
                 {
                     var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                    if (!songRater.SongRatings.ContainsKey(formattedName)
-                        || songRater.SongRatings[formattedName] >= AcceptableRating)
+                    if (!Rater.SongRatings.ContainsKey(formattedName)
+                        || Rater.SongRatings[formattedName] >= AcceptableRating)
                     {
                         listViewSongs.Items[i].Selected = true;
                         break;
@@ -479,8 +504,8 @@ namespace MusicSorter
                 while (--i >= 0)
                 {
                     var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                    if (!songRater.SongRatings.ContainsKey(formattedName)
-                        || songRater.SongRatings[formattedName] >= AcceptableRating)
+                    if (!Rater.SongRatings.ContainsKey(formattedName)
+                        || Rater.SongRatings[formattedName] >= AcceptableRating)
                     {
                         listViewSongs.Items[i].Selected = true;
                         break;
