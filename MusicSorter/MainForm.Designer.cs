@@ -44,6 +44,7 @@
             this.labelCurrentTime = new System.Windows.Forms.Label();
             this.labelTotalTime = new System.Windows.Forms.Label();
             this.labelResponse = new System.Windows.Forms.Label();
+            this.buttonMode = new System.Windows.Forms.Button();
             this.groupBoxSongList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSong)).BeginInit();
@@ -235,11 +236,24 @@
             this.labelResponse.Text = "Response";
             this.labelResponse.Visible = false;
             // 
+            // buttonMode
+            // 
+            this.buttonMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonMode.Location = new System.Drawing.Point(900, 812);
+            this.buttonMode.Name = "buttonMode";
+            this.buttonMode.Size = new System.Drawing.Size(97, 32);
+            this.buttonMode.TabIndex = 17;
+            this.buttonMode.TabStop = false;
+            this.buttonMode.Text = "Fast Sort";
+            this.buttonMode.UseVisualStyleBackColor = true;
+            this.buttonMode.Click += new System.EventHandler(this.buttonMode_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1517, 856);
+            this.Controls.Add(this.buttonMode);
             this.Controls.Add(this.labelResponse);
             this.Controls.Add(this.labelTotalTime);
             this.Controls.Add(this.labelCurrentTime);
@@ -286,6 +300,7 @@
         private System.Windows.Forms.Label labelCurrentTime;
         private System.Windows.Forms.Label labelTotalTime;
         private System.Windows.Forms.Label labelResponse;
+        private System.Windows.Forms.Button buttonMode;
     }
 }
 

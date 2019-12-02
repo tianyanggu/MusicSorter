@@ -12,12 +12,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MusicSorter.Helpers;
 using MusicSorter.Forms;
+using MusicSorter.Constants;
 
 namespace MusicSorter
 {
     public partial class MainForm : Form
     {
         private bool Playing { get; set; }
+        private PlaybackMode Mode { get; set; } = PlaybackMode.FastSorting;
         private string CurrentSong { get; set; }
         private WaveOutEvent OutputDevice { get; set; }
         private AudioFileReader AudioFile { get; set; }
@@ -132,6 +134,11 @@ namespace MusicSorter
                             if (listViewSongs.SelectedIndices != null && listViewSongs.SelectedIndices.Count > 0)
                             {
                                 UpdateRating(listViewSongs.SelectedIndices[0], i);
+
+                                if (Mode == PlaybackMode.FastSorting)
+                                {
+                                    NextSong();
+                                }
                             }                            
                         }
                         else
@@ -140,34 +147,35 @@ namespace MusicSorter
                         }
                     }
                 }
-                else
+                else if (e.KeyCode ==  Keys.Space)
                 {
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Down:
-                            NextSong();
-                            break;
-                        case Keys.Up:
-                            PrevSong();
-                            break;
-                        case Keys.Left:
-                            SkipSongPosition(-1);
-                            break;
-                        case Keys.Right:
-                            SkipSongPosition(1);
-                            break;
-                        case Keys.Space:
-                            TogglePlay(!Playing);
-                            break;
-
-                        default:
-                            break;
-                    }
+                    TogglePlay(!Playing);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Down:
+                    NextSong();
+                    return true;
+                case Keys.Up:
+                    PrevSong();
+                    return true;
+                case Keys.Left:
+                    SkipSongPosition(-1);
+                    return true;
+                case Keys.Right:
+                    SkipSongPosition(1);
+                    return true;
+                default:
+                    return base.ProcessCmdKey(ref msg, keyData);
             }
         }
 
@@ -289,6 +297,20 @@ namespace MusicSorter
             if (AudioFile.Position == AudioFile.Length)
             {
                 NextSong();
+            }
+        }
+
+        private void buttonMode_Click(object sender, EventArgs e)
+        {
+            if (Mode == PlaybackMode.FastSorting)
+            {
+                Mode = PlaybackMode.Normal;
+                buttonMode.Text = "Playback";
+            }
+            else
+            {
+                Mode = PlaybackMode.FastSorting;
+                buttonMode.Text = "Fast Sort";
             }
         }
         #endregion
@@ -539,6 +561,7 @@ namespace MusicSorter
             }
         }
         #endregion
+
         #endregion
     }
 }

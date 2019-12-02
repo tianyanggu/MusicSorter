@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\SorterConstants.cs" />
     <Compile Include="Forms\HelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
