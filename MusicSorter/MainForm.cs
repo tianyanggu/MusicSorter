@@ -304,11 +304,18 @@ namespace MusicSorter
 
         private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
         {
-            var formattedName = GetFormattedName(CurrentSong);
-            if ((AudioFile.Position == AudioFile.Length && Mode != PlaybackMode.PlaybackSorting)
-                || (Rater.SongRatings.ContainsKey(formattedName) && Mode == PlaybackMode.PlaybackSorting))
+            try
             {
-                NextSong();
+                var formattedName = GetFormattedName(CurrentSong);
+                if ((AudioFile.Position == AudioFile.Length && Mode != PlaybackMode.PlaybackSorting)
+                    || (Rater.SongRatings.ContainsKey(formattedName) && Mode == PlaybackMode.PlaybackSorting))
+                {
+                    NextSong();
+                }
+            }
+            catch (NullReferenceException)
+            {
+                //have song playing and then load empty folder
             }
         }
 
@@ -550,6 +557,7 @@ namespace MusicSorter
                         || Rater.SongRatings[formattedName] >= AcceptableRating)
                     {
                         listViewSongs.Items[i].Selected = true;
+                        LoadSong(listViewSongs.SelectedItems[0].Text);
                         break;
                     }
                 }
@@ -568,6 +576,7 @@ namespace MusicSorter
                         || Rater.SongRatings[formattedName] >= AcceptableRating)
                     {
                         listViewSongs.Items[i].Selected = true;
+                        LoadSong(listViewSongs.SelectedItems[0].Text);
                         break;
                     }
                 }
