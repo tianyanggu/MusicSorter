@@ -304,8 +304,9 @@ namespace MusicSorter
 
         private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
         {
-            if (AudioFile.Position == AudioFile.Length
-                && Mode != PlaybackMode.PlaybackSorting)
+            var formattedName = GetFormattedName(CurrentSong);
+            if ((AudioFile.Position == AudioFile.Length && Mode != PlaybackMode.PlaybackSorting)
+                || (Rater.SongRatings.ContainsKey(formattedName) && Mode == PlaybackMode.PlaybackSorting))
             {
                 NextSong();
             }
@@ -405,19 +406,26 @@ namespace MusicSorter
             var songFileLocation = GetSongFileLocation(songFileName);
             if (!string.IsNullOrWhiteSpace(songFileLocation))
             {
-                using (var file = TagLib.File.Create(songFileLocation))
+                try
                 {
-                    if (file.Tag.Performers.Length >= 1
-                        && !string.IsNullOrWhiteSpace(file.Tag.Title))
+                    using (var file = TagLib.File.Create(songFileLocation))
                     {
-                        var performers = file.Tag.Performers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                        Array.Sort(performers);
-                        for (int i = 0; i < performers.Length; i++)
+                        if (file.Tag.Performers.Length >= 1
+                            && !string.IsNullOrWhiteSpace(file.Tag.Title))
                         {
-                            performers[i] = performers[i].Trim();
+                            var performers = file.Tag.Performers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                            Array.Sort(performers);
+                            for (int i = 0; i < performers.Length; i++)
+                            {
+                                performers[i] = performers[i].Trim();
+                            }
+                            return Rater.FormatSongName(string.Join(", ", performers), file.Tag.Title);
                         }
-                        return Rater.FormatSongName(string.Join(", ", performers), file.Tag.Title);
                     }
+                }
+                catch
+                {
+                    //file type may not support tags, format normally
                 }
             }
             return Rater.FormatSongName(songFileName);
