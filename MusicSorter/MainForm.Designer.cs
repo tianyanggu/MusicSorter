@@ -240,9 +240,9 @@
             // buttonMode
             // 
             this.buttonMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonMode.Location = new System.Drawing.Point(900, 812);
+            this.buttonMode.Location = new System.Drawing.Point(871, 812);
             this.buttonMode.Name = "buttonMode";
-            this.buttonMode.Size = new System.Drawing.Size(97, 32);
+            this.buttonMode.Size = new System.Drawing.Size(126, 32);
             this.buttonMode.TabIndex = 17;
             this.buttonMode.TabStop = false;
             this.buttonMode.Text = "Fast Sort";

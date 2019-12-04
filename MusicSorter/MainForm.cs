@@ -134,7 +134,8 @@ namespace MusicSorter
                             {
                                 UpdateRating(listViewSongs.SelectedIndices[0], i);
 
-                                if (Mode == PlaybackMode.FastSorting)
+                                if (Mode == PlaybackMode.FastSorting
+                                    || (Mode == PlaybackMode.PlaybackSorting && OutputDevice.PlaybackState == PlaybackState.Stopped))
                                 {
                                     NextSong();
                                 }
@@ -276,6 +277,11 @@ namespace MusicSorter
                 Mode = PlaybackMode.Normal;
                 buttonMode.Text = "Playback";
             }
+            else if (Mode == PlaybackMode.Normal)
+            {
+                Mode = PlaybackMode.PlaybackSorting;
+                buttonMode.Text = "Playback Sort";
+            }
             else
             {
                 Mode = PlaybackMode.FastSorting;
@@ -298,7 +304,8 @@ namespace MusicSorter
 
         private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
         {
-            if (AudioFile.Position == AudioFile.Length)
+            if (AudioFile.Position == AudioFile.Length
+                && Mode != PlaybackMode.PlaybackSorting)
             {
                 NextSong();
             }
