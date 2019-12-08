@@ -135,7 +135,8 @@ namespace MusicSorter
                                 UpdateRating(listViewSongs.SelectedIndices[0], i);
 
                                 if (Mode == PlaybackMode.FastSorting
-                                    || (Mode == PlaybackMode.PlaybackSorting && OutputDevice.PlaybackState == PlaybackState.Stopped))
+                                    || (Mode == PlaybackMode.PlaybackSorting && 
+                                       (OutputDevice.PlaybackState == PlaybackState.Stopped || i < AcceptableRating)))
                                 {
                                     NextSong();
                                 }
@@ -552,14 +553,7 @@ namespace MusicSorter
                 int i = listViewSongs.SelectedIndices[0];
                 while (++i < listViewSongs.Items.Count)
                 {
-                    var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                    if (!Rater.SongRatings.ContainsKey(formattedName)
-                        || Rater.SongRatings[formattedName] >= AcceptableRating)
-                    {
-                        listViewSongs.Items[i].Selected = true;
-                        LoadSong(listViewSongs.SelectedItems[0].Text);
-                        break;
-                    }
+                    if (LoadAcceptableSong(i)) { break; }
                 }
             }
         }
@@ -571,16 +565,23 @@ namespace MusicSorter
                 int i = listViewSongs.SelectedIndices[0];
                 while (--i >= 0)
                 {
-                    var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                    if (!Rater.SongRatings.ContainsKey(formattedName)
-                        || Rater.SongRatings[formattedName] >= AcceptableRating)
-                    {
-                        listViewSongs.Items[i].Selected = true;
-                        LoadSong(listViewSongs.SelectedItems[0].Text);
-                        break;
-                    }
+                    if (LoadAcceptableSong(i)) { break; }
                 }
             }
+        }
+
+        private bool LoadAcceptableSong(int i)
+        {
+            var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
+            if (!Rater.SongRatings.ContainsKey(formattedName)
+                || Rater.SongRatings[formattedName] >= AcceptableRating)
+            {
+                listViewSongs.Items[i].Selected = true;
+                LoadSong(listViewSongs.SelectedItems[0].Text);
+                TogglePlay(true);
+                return true;
+            }
+            return false;
         }
         #endregion
 

@@ -44,7 +44,7 @@ namespace MusicSorter.Helpers
                         throw new Exception($"Data corrupted for song: {line}");
                     }
 
-                    var formattedName = line.Substring(0, index).Trim();
+                    var formattedName = line.Substring(0, index).ToLower().Trim();
                     var rating = Convert.ToInt32(line.Substring(index + 1));
                     ratings.Add(formattedName, rating);
                 }
@@ -156,7 +156,7 @@ namespace MusicSorter.Helpers
                 }
             }
 
-            return $"{formattedArtist} - {formattedSong}";
+            return $"{formattedArtist} - {formattedSong}".ToLower();
         }
     }
 }
