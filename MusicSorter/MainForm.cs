@@ -313,6 +313,7 @@ namespace MusicSorter
                 {
                     NextSong();
                 }
+                TogglePlay(false);
             }
             catch (NullReferenceException)
             {
