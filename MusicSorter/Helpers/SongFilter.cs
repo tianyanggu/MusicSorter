@@ -10,8 +10,8 @@ namespace MusicSorter.Helpers
 {
     public class SongRater
     {
-        private const string FilterFileName = "SongRatings.txt"; //shouldn't need Path.Combine with AppDomain.CurrentDomain.BaseDirectory
-        private const string BackupFilterFileName = "SongRatings_Backup.txt";
+        private static readonly string FilterFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SongRatings.txt");
+        private static readonly string BackupFilterFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SongRatings_Backup.txt");
 
         public Dictionary<string, int> SongRatings { get; } = new Dictionary<string, int>();
         public bool SongsRatingsUpdated { get; set; } = false;

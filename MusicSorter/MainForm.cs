@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using MusicSorter.Helpers;
 using MusicSorter.Forms;
 using MusicSorter.Constants;
+using static MusicSorter.Helpers.InterprocessPipe;
 
 namespace MusicSorter
 {
@@ -23,16 +24,27 @@ namespace MusicSorter
         private string CurrentSong { get; set; }
         private WaveOutEvent OutputDevice { get; set; }
         private AudioFileReader AudioFile { get; set; }
-        private Timer SongTimer { get; set; }
+        private Timer SongTimer { get; set; } = new Timer();
         private SongRater Rater { get; set; }
 
 
-        private int AcceptableRating = 5;
+        private int AcceptableRating = 5; //changeable values in future
         private int GreatRating = 8;
+        private string StartUpSong = string.Empty;
 
-        public MainForm()
+        public MainForm(string[] args)
         {
             InitializeComponent();
+
+            if (args.Length > 0)
+            {
+                StartUpSong = args[0];
+            }
+        }
+
+        private void PipeListener_MessageReceived(object sender, NamedPipeListenerMessageReceivedEventArgs<string> e)
+        {
+            LoadStartupSong(e.Message);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -40,13 +52,50 @@ namespace MusicSorter
             try
             {
                 Rater = new SongRater();
+
                 textBoxMusicFolder.Text = Rater.PreviousFolder;
                 PopulateSongs(textBoxMusicFolder.Text);
+
+                var pipeListener = new NamedPipeListener<String>(); // instantiate an instance
+                pipeListener.MessageReceived += PipeListener_MessageReceived;
+                pipeListener.Error += (errSender, eventArgs) => MessageBox.Show($"Error ({eventArgs.ErrorType}): {eventArgs.Exception.Message}");
+                pipeListener.Start(); // when you're ready, start listening
+
+                //cannot instantiate new timer when ui not rendered (e.g. behind a window)
+                //just have it constantly tick instead
+                SongTimer.Interval = 1000;
+                SongTimer.Tick += SongTimer_Tick;
+                SongTimer.Enabled = true;
+
+                LoadStartupSong(StartUpSong);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void LoadStartupSong(string startUpSong)
+        {
+            var folder = Path.GetDirectoryName(startUpSong);
+            var songName = Path.GetFileName(startUpSong);
+
+            if (folder != textBoxMusicFolder.Text)
+            {
+                textBoxMusicFolder.Text = folder;
+                PopulateSongs(textBoxMusicFolder.Text, false);
+            }
+
+            for (int i = 0; i < listViewSongs.Items.Count; i++)
+            {
+                if (listViewSongs.Items[i].Text == songName)
+                {
+                    listViewSongs.Items[i].Selected = true;
+                }
+            }
+            
+            LoadSong(songName);
+            TogglePlay(true);
         }
 
         #region events
@@ -299,8 +348,11 @@ namespace MusicSorter
 
         private void SongTimer_Tick(object sender, EventArgs e)
         {
-            labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
-            trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
+            if (AudioFile != null && AudioFile.CurrentTime != null)
+            {
+                labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
+            }
         }
 
         private void OutputDevice_PlaybackStopped(object sender, StoppedEventArgs e)
@@ -312,8 +364,9 @@ namespace MusicSorter
                     || (Rater.SongRatings.ContainsKey(formattedName) && Mode == PlaybackMode.PlaybackSorting))
                 {
                     NextSong();
+                    return;
                 }
-                TogglePlay(false);
+                TogglePlay(false, true);
             }
             catch (NullReferenceException)
             {
@@ -343,16 +396,21 @@ namespace MusicSorter
         {
             if (rating >= GreatRating)
             {
-                listViewSongs.Items[pos].BackColor = Color.Gold;
+                UpdateColor(pos, Color.Gold);
             }
             else if (rating >= AcceptableRating)
             {
-                listViewSongs.Items[pos].BackColor = Color.LightGreen;
+                UpdateColor(pos, Color.LightGreen);
             }
             else
             {
-                listViewSongs.Items[pos].BackColor = Color.Salmon;
+                UpdateColor(pos, Color.Salmon);
             }
+        }
+
+        private void UpdateColor(int pos, Color color)
+        {
+            listViewSongs.Items[pos].BackColor = color;
         }
 
         private void DisplayResponseMessage(string msg)
@@ -366,7 +424,7 @@ namespace MusicSorter
             responseTimer.Enabled = true;
         }
 
-        private void PopulateSongs(string folder)
+        private void PopulateSongs(string folder, bool loadSong = true)
         {
             if (!string.IsNullOrWhiteSpace(folder))
             {
@@ -389,10 +447,16 @@ namespace MusicSorter
                         var rating = Rater.SongRatings[formattedName];
                         UpdateColor(i, rating);
                     }
+
+                    var ext = Path.GetExtension(songFileName).ToLower().Trim();
+                    if (!SorterConstants.SupportedExtensions.Contains(ext))
+                    {
+                        UpdateColor(i, Color.OrangeRed);
+                    }
                 }
 
                 //find first acceptable song
-                if (listViewSongs.Items.Count > 0)
+                if (listViewSongs.Items.Count > 0 && loadSong)
                 {
                     for (int i = 0; i < listViewSongs.Items.Count; i++)
                     {
@@ -457,18 +521,10 @@ namespace MusicSorter
                 {
                     AudioFile.Dispose();
                 }
-                if (SongTimer != null)
-                {
-                    SongTimer.Dispose();
-                }
 
                 AudioFile = new AudioFileReader(fileLocation);
                 OutputDevice = new WaveOutEvent();
-                SongTimer = new Timer();
 
-                SongTimer.Interval = 1000;
-                SongTimer.Tick += SongTimer_Tick;
-                SongTimer.Enabled = true;
                 labelTotalTime.Text = AudioFile.TotalTime.ToString("hh\\:mm\\:ss");
                 trackBarSong.Maximum = (int)AudioFile.TotalTime.TotalSeconds;
 
@@ -508,7 +564,7 @@ namespace MusicSorter
             }
         }
 
-        private void TogglePlay(bool play)
+        private void TogglePlay(bool play, bool changeUIOnly = false)
         {
             Playing = play;
 
@@ -519,12 +575,12 @@ namespace MusicSorter
                 if (Playing)
                 {
                     buttonPlay.Text = "||";
-                    OutputDevice.Play();
+                    if (!changeUIOnly) { OutputDevice.Play(); }
                 }
                 else
                 {
                     buttonPlay.Text = ">";
-                    OutputDevice.Stop();
+                    if (!changeUIOnly) { OutputDevice.Stop(); }
                 }
             }
         }
@@ -573,9 +629,11 @@ namespace MusicSorter
 
         private bool LoadAcceptableSong(int i)
         {
-            var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-            if (!Rater.SongRatings.ContainsKey(formattedName)
-                || Rater.SongRatings[formattedName] >= AcceptableRating)
+            var songName = listViewSongs.Items[i].Text;
+            var formattedName = GetFormattedName(songName);
+            var ext = Path.GetExtension(songName).ToLower().Trim();
+            if ((!Rater.SongRatings.ContainsKey(formattedName) || Rater.SongRatings[formattedName] >= AcceptableRating)
+                && SorterConstants.SupportedExtensions.Contains(ext))
             {
                 listViewSongs.Items[i].Selected = true;
                 LoadSong(listViewSongs.SelectedItems[0].Text);
