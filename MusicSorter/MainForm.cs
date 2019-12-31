@@ -26,14 +26,12 @@ namespace MusicSorter
         private AudioFileReader AudioFile { get; set; }
         private Timer SongTimer { get; set; } = new Timer();
         private SongRater Rater { get; set; }
+        private SongTrimmer Trimmer { get; set; } = new SongTrimmer();
 
 
         private int AcceptableRating = 5; //changeable values in future
         private int GreatRating = 8;
         private string StartUpSong = string.Empty;
-
-        //TODO cropping
-        //allow go back to bad songs
 
         public MainForm(string[] args)
         {
@@ -115,14 +113,21 @@ namespace MusicSorter
         {
             try
             {
-                TogglePlay(!Playing);
+                if (Trimmer.IsTrimming)
+                {
+                    ResetTrimmingUI();
+                    TogglePlay(true);
+                }
+                else
+                {
+                    TogglePlay(!Playing);
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
-
 
         private void buttonNext_Click(object sender, EventArgs e)
         {
@@ -164,12 +169,12 @@ namespace MusicSorter
                                 UpdateRating(listViewSongs.SelectedIndices[0], i);
 
                                 if (Mode == PlaybackMode.FastSorting
-                                    || (Mode == PlaybackMode.PlaybackSorting && 
+                                    || (Mode == PlaybackMode.PlaybackSorting &&
                                        (OutputDevice.PlaybackState == PlaybackState.Stopped || i < AcceptableRating)))
                                 {
                                     NextSong();
                                 }
-                            }                            
+                            }
                         }
                         else
                         {
@@ -177,7 +182,7 @@ namespace MusicSorter
                         }
                     }
                 }
-                else if (e.KeyCode ==  Keys.Space)
+                else if (e.KeyCode == Keys.Space)
                 {
                     TogglePlay(!Playing);
                 }
@@ -312,6 +317,11 @@ namespace MusicSorter
                 Mode = PlaybackMode.PlaybackSorting;
                 buttonMode.Text = "Playback Sort";
             }
+            else if (Mode == PlaybackMode.PlaybackSorting)
+            {
+                Mode = PlaybackMode.Loop;
+                buttonMode.Text = "Loop";
+            }
             else
             {
                 Mode = PlaybackMode.FastSorting;
@@ -322,7 +332,7 @@ namespace MusicSorter
         {
             var percent = Decimal.Divide(e.X, trackBarSong.Width);
             trackBarSong.Value = Convert.ToInt32(percent * trackBarSong.Maximum);
-            AudioFile.Position = AudioFile.Position = (long)(AudioFile.Length * percent);
+            AudioFile.Position = (long)(AudioFile.Length * percent);
         }
         #endregion
 
@@ -330,7 +340,14 @@ namespace MusicSorter
         {
             if (AudioFile != null && AudioFile.CurrentTime != null)
             {
-                labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                if (Trimmer.IsTrimming && Trimmer.StartTime != null)
+                {
+                    labelTotalTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                }
+                else
+                {
+                    labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                }
                 trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
             }
         }
@@ -340,11 +357,19 @@ namespace MusicSorter
             try
             {
                 var formattedName = GetFormattedName(CurrentSong);
-                if (AudioFile.Position == AudioFile.Length &&
+                if (AudioFile.Position == AudioFile.Length && //when song finished
                     (Mode != PlaybackMode.PlaybackSorting
                     || (Mode == PlaybackMode.PlaybackSorting && Rater.SongRatings.ContainsKey(formattedName))))
                 {
-                    NextSong();
+                    if (Mode == PlaybackMode.Loop)
+                    {
+                        AudioFile.Position = 0;
+                        TogglePlay(true);
+                    }
+                    else
+                    {
+                        NextSong();
+                    }
                     return;
                 }
                 TogglePlay(false, true);
@@ -362,17 +387,44 @@ namespace MusicSorter
                 labelResponse.Visible = false;
             }));
         }
+
+        private void buttonTrim_Click(object sender, EventArgs e)
+        {
+            if (!Trimmer.IsTrimming)
+            {
+                Trimmer.IsTrimming = true;
+                buttonPlay.Text = "Cancel";
+
+                buttonTrim.Text = "Start Time";
+                labelCurrentTime.ForeColor = Color.LightGreen;
+            }
+            else if (Trimmer.IsTrimming && Trimmer.StartTime == null)
+            {
+                buttonTrim.Text = "End Time";
+                labelCurrentTime.ForeColor = new System.Drawing.Color();
+                labelTotalTime.ForeColor = Color.LightGreen;
+                Trimmer.StartTime = AudioFile.CurrentTime;
+            }
+            else if (Trimmer.IsTrimming)
+            {
+                Trimmer.EndTime = AudioFile.CurrentTime;
+                Trimmer.SongFile = GetSongFileLocation(CurrentSong);
+                var outputSong = Trimmer.TrimAudio();
+                ResetTrimmingUI();
+                LoadStartupSong(outputSong, true);                
+            }
+        }
         #endregion
 
         #region private methods
-        private void LoadStartupSong(string startUpSong)
+        private void LoadStartupSong(string startUpSong, bool refreshFolder = false)
         {
-            if (!string.IsNullOrWhiteSpace(StartUpSong))
+            if (!string.IsNullOrWhiteSpace(startUpSong))
             {
                 var folder = Path.GetDirectoryName(startUpSong);
                 var songName = Path.GetFileName(startUpSong);
 
-                if (folder != textBoxMusicFolder.Text)
+                if (folder != textBoxMusicFolder.Text || refreshFolder)
                 {
                     textBoxMusicFolder.Text = folder;
                     PopulateSongs(textBoxMusicFolder.Text, false);
@@ -514,7 +566,7 @@ namespace MusicSorter
         private void LoadSong(string selectedSong)
         {
             var fileLocation = GetSongFileLocation(selectedSong);
-            if (string.IsNullOrWhiteSpace(fileLocation)) return;
+            if (string.IsNullOrWhiteSpace(fileLocation) || Trimmer.IsTrimming) return;
 
             textBoxCurrentSong.Text = selectedSong;
 
@@ -648,6 +700,14 @@ namespace MusicSorter
                 return true;
             }
             return false;
+        }
+
+        private void ResetTrimmingUI()
+        {
+            labelCurrentTime.ForeColor = new System.Drawing.Color();
+            labelTotalTime.ForeColor = new System.Drawing.Color();
+            Trimmer.ResetTrimmer();
+            buttonTrim.Text = "Trim";
         }
         #endregion
 

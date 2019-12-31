@@ -46,6 +46,7 @@
             this.labelTotalTime = new System.Windows.Forms.Label();
             this.labelResponse = new System.Windows.Forms.Label();
             this.buttonMode = new System.Windows.Forms.Button();
+            this.buttonTrim = new System.Windows.Forms.Button();
             this.groupBoxSongList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSong)).BeginInit();
@@ -230,7 +231,7 @@
             // 
             this.labelResponse.AutoSize = true;
             this.labelResponse.ForeColor = System.Drawing.Color.Green;
-            this.labelResponse.Location = new System.Drawing.Point(218, 818);
+            this.labelResponse.Location = new System.Drawing.Point(321, 818);
             this.labelResponse.Name = "labelResponse";
             this.labelResponse.Size = new System.Drawing.Size(82, 20);
             this.labelResponse.TabIndex = 16;
@@ -249,11 +250,24 @@
             this.buttonMode.UseVisualStyleBackColor = true;
             this.buttonMode.Click += new System.EventHandler(this.buttonMode_Click);
             // 
+            // buttonAudioTrimmer
+            // 
+            this.buttonTrim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTrim.Location = new System.Drawing.Point(218, 812);
+            this.buttonTrim.Name = "buttonAudioTrimmer";
+            this.buttonTrim.Size = new System.Drawing.Size(97, 32);
+            this.buttonTrim.TabIndex = 18;
+            this.buttonTrim.TabStop = false;
+            this.buttonTrim.Text = "Trim";
+            this.buttonTrim.UseVisualStyleBackColor = true;
+            this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1517, 856);
+            this.Controls.Add(this.buttonTrim);
             this.Controls.Add(this.buttonMode);
             this.Controls.Add(this.labelResponse);
             this.Controls.Add(this.labelTotalTime);
@@ -303,6 +317,7 @@
         private System.Windows.Forms.Label labelTotalTime;
         private System.Windows.Forms.Label labelResponse;
         private System.Windows.Forms.Button buttonMode;
+        private System.Windows.Forms.Button buttonTrim;
     }
 }
 

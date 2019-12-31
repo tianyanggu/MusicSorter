@@ -10,7 +10,8 @@ namespace MusicSorter.Constants
     {
         Normal,
         FastSorting,
-        PlaybackSorting
+        PlaybackSorting,
+        Loop
     }
 
     public static class SorterConstants
