@@ -78,7 +78,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\SongFilter.cs" />
+    <Compile Include="Helpers\SongRater.cs" />
     <EmbeddedResource Include="Forms\HelpForm.resx">
       <DependentUpon>HelpForm.cs</DependentUpon>
     </EmbeddedResource>

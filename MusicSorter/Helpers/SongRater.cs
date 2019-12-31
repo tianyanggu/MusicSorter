@@ -142,6 +142,10 @@ namespace MusicSorter.Helpers
                             startPos = hyphenIndexes[0] + 1;
                             hyphenPos = hyphenIndexes[1];
                         }
+                        else
+                        {
+                            return string.Empty;
+                        }
                     }
 
                     var length = hyphenPos - startPos;
@@ -151,8 +155,13 @@ namespace MusicSorter.Helpers
                     formattedArtist = songName.Substring(startPos, length).Trim();
                     formattedSong = songName.Substring(songNamePos).Trim();
 
-                    Regex regChars = new Regex("[-|]");
+                    Regex regChars = new Regex("[-|]"); //get all dash and pipes for removal
                     formattedSong = regChars.Replace(formattedSong, string.Empty);
+
+                    if (string.IsNullOrWhiteSpace(formattedArtist) || string.IsNullOrWhiteSpace(formattedSong))
+                    {
+                        return string.Empty;
+                    }
                 }
             }
 

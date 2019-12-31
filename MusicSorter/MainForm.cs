@@ -32,6 +32,9 @@ namespace MusicSorter
         private int GreatRating = 8;
         private string StartUpSong = string.Empty;
 
+        //TODO cropping
+        //allow go back to bad songs
+
         public MainForm(string[] args)
         {
             InitializeComponent();
@@ -40,11 +43,6 @@ namespace MusicSorter
             {
                 StartUpSong = args[0];
             }
-        }
-
-        private void PipeListener_MessageReceived(object sender, NamedPipeListenerMessageReceivedEventArgs<string> e)
-        {
-            LoadStartupSong(e.Message);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -75,31 +73,13 @@ namespace MusicSorter
             }
         }
 
-        private void LoadStartupSong(string startUpSong)
-        {
-            var folder = Path.GetDirectoryName(startUpSong);
-            var songName = Path.GetFileName(startUpSong);
-
-            if (folder != textBoxMusicFolder.Text)
-            {
-                textBoxMusicFolder.Text = folder;
-                PopulateSongs(textBoxMusicFolder.Text, false);
-            }
-
-            for (int i = 0; i < listViewSongs.Items.Count; i++)
-            {
-                if (listViewSongs.Items[i].Text == songName)
-                {
-                    listViewSongs.Items[i].Selected = true;
-                }
-            }
-            
-            LoadSong(songName);
-            TogglePlay(true);
-        }
-
         #region events
         #region UI Events
+        private void PipeListener_MessageReceived(object sender, NamedPipeListenerMessageReceivedEventArgs<string> e)
+        {
+            LoadStartupSong(e.Message);
+        }
+
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
             try
@@ -360,8 +340,9 @@ namespace MusicSorter
             try
             {
                 var formattedName = GetFormattedName(CurrentSong);
-                if ((AudioFile.Position == AudioFile.Length && Mode != PlaybackMode.PlaybackSorting)
-                    || (Rater.SongRatings.ContainsKey(formattedName) && Mode == PlaybackMode.PlaybackSorting))
+                if (AudioFile.Position == AudioFile.Length &&
+                    (Mode != PlaybackMode.PlaybackSorting
+                    || (Mode == PlaybackMode.PlaybackSorting && Rater.SongRatings.ContainsKey(formattedName))))
                 {
                     NextSong();
                     return;
@@ -384,6 +365,32 @@ namespace MusicSorter
         #endregion
 
         #region private methods
+        private void LoadStartupSong(string startUpSong)
+        {
+            if (!string.IsNullOrWhiteSpace(StartUpSong))
+            {
+                var folder = Path.GetDirectoryName(startUpSong);
+                var songName = Path.GetFileName(startUpSong);
+
+                if (folder != textBoxMusicFolder.Text)
+                {
+                    textBoxMusicFolder.Text = folder;
+                    PopulateSongs(textBoxMusicFolder.Text, false);
+                }
+
+                for (int i = 0; i < listViewSongs.Items.Count; i++)
+                {
+                    if (listViewSongs.Items[i].Text == songName)
+                    {
+                        listViewSongs.Items[i].Selected = true;
+                    }
+                }
+
+                LoadSong(songName);
+                TogglePlay(true);
+            }
+        }
+
         private void UpdateRating(int pos, int rating)
         {
             var formattedName = GetFormattedName(CurrentSong);
