@@ -390,28 +390,43 @@ namespace MusicSorter
 
         private void buttonTrim_Click(object sender, EventArgs e)
         {
-            if (!Trimmer.IsTrimming)
+            if (Path.GetExtension(CurrentSong).ToLower() == ".mp4")
             {
-                Trimmer.IsTrimming = true;
-                buttonPlay.Text = "Cancel";
+                try
+                {
+                    var outputSong = SongConverter.ConvertMp4ToMp3(GetSongFileLocation(CurrentSong));
+                    LoadStartupSong(outputSong, true);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Conversion Failed: {ex.Message}");
+                }
+            }
+            else
+            {
+                if (!Trimmer.IsTrimming)
+                {
+                    Trimmer.IsTrimming = true;
+                    buttonPlay.Text = "Cancel";
 
-                buttonTrim.Text = "Start Time";
-                labelCurrentTime.ForeColor = Color.LightGreen;
-            }
-            else if (Trimmer.IsTrimming && Trimmer.StartTime == null)
-            {
-                buttonTrim.Text = "End Time";
-                labelCurrentTime.ForeColor = new System.Drawing.Color();
-                labelTotalTime.ForeColor = Color.LightGreen;
-                Trimmer.StartTime = AudioFile.CurrentTime;
-            }
-            else if (Trimmer.IsTrimming)
-            {
-                Trimmer.EndTime = AudioFile.CurrentTime;
-                Trimmer.SongFile = GetSongFileLocation(CurrentSong);
-                var outputSong = Trimmer.TrimAudio();
-                ResetTrimmingUI();
-                LoadStartupSong(outputSong, true);                
+                    buttonTrim.Text = "Start Time";
+                    labelCurrentTime.ForeColor = Color.LightGreen;
+                }
+                else if (Trimmer.IsTrimming && Trimmer.StartTime == null)
+                {
+                    buttonTrim.Text = "End Time";
+                    labelCurrentTime.ForeColor = new System.Drawing.Color();
+                    labelTotalTime.ForeColor = Color.LightGreen;
+                    Trimmer.StartTime = AudioFile.CurrentTime;
+                }
+                else if (Trimmer.IsTrimming)
+                {
+                    Trimmer.EndTime = AudioFile.CurrentTime;
+                    Trimmer.SongFile = GetSongFileLocation(CurrentSong);
+                    var outputSong = Trimmer.TrimAudio();
+                    ResetTrimmingUI();
+                    LoadStartupSong(outputSong, true);
+                }
             }
         }
         #endregion
@@ -435,11 +450,9 @@ namespace MusicSorter
                     if (listViewSongs.Items[i].Text == songName)
                     {
                         listViewSongs.Items[i].Selected = true;
+                        //event takes care of loading song
                     }
                 }
-
-                LoadSong(songName);
-                TogglePlay(true);
             }
         }
 
@@ -519,13 +532,8 @@ namespace MusicSorter
                 {
                     for (int i = 0; i < listViewSongs.Items.Count; i++)
                     {
-                        var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                        if (!Rater.SongRatings.ContainsKey(formattedName)
-                            || Rater.SongRatings[formattedName] >= AcceptableRating)
+                        if (LoadAcceptableSong(i))
                         {
-                            listViewSongs.Items[i].Selected = true;
-                            LoadSong(listViewSongs.SelectedItems[0].Text);
-                            TogglePlay(true);
                             break;
                         }
                     }
@@ -569,6 +577,15 @@ namespace MusicSorter
             if (string.IsNullOrWhiteSpace(fileLocation) || Trimmer.IsTrimming) return;
 
             textBoxCurrentSong.Text = selectedSong;
+
+            if (Path.GetExtension(selectedSong).ToLower() == ".mp4")
+            {
+                buttonTrim.Text = "Convert";
+            }
+            else
+            {
+                buttonTrim.Text = "Trim";
+            }
 
             try
             {
@@ -694,9 +711,7 @@ namespace MusicSorter
             if ((!Rater.SongRatings.ContainsKey(formattedName) || Rater.SongRatings[formattedName] >= AcceptableRating)
                 && SorterConstants.SupportedExtensions.Contains(ext))
             {
-                listViewSongs.Items[i].Selected = true;
-                LoadSong(listViewSongs.SelectedItems[0].Text);
-                TogglePlay(true);
+                listViewSongs.Items[i].Selected = true; //event takes care of loading
                 return true;
             }
             return false;
