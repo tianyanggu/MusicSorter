@@ -15,7 +15,7 @@ namespace MusicSorter.Helpers
         public string SongFile { get; set; }
         public bool IsTrimming { get; set; }
 
-        //TODO aiff and cue file type 
+        //MAYBE aiff and cue file type 
 
         public string TrimAudio()
         {
@@ -109,7 +109,15 @@ namespace MusicSorter.Helpers
                 }
             }
 
-            //TODO duplicate metadata
+            using (var inputTags = TagLib.File.Create(inputPath))
+            using (var outputTags = TagLib.File.Create(outputPath))
+            {
+                inputTags.Tag.CopyTo(outputTags.Tag, true);
+                var pictures = new TagLib.IPicture[inputTags.Tag.Pictures.Length];
+                inputTags.Tag.Pictures.CopyTo(pictures, 0);
+                outputTags.Tag.Pictures = pictures;
+                outputTags.Save();
+            }
         }
 
         private void TrimWav(string inputPath, string outputPath, TimeSpan start, TimeSpan end)
