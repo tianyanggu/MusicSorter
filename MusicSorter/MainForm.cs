@@ -33,6 +33,9 @@ namespace MusicSorter
         private int GreatRating = 8;
         private string StartUpSong = string.Empty;
 
+        //TODO adjust mp3 volume when converting mp3 to mp3 or mp4 to mp3
+        //TODO volume bar
+
         public MainForm(string[] args)
         {
             InitializeComponent();
@@ -179,12 +182,17 @@ namespace MusicSorter
                         else
                         {
                             MoveSongPosition(i);
+                            TogglePlay(true);
                         }
                     }
                 }
                 else if (e.KeyCode == Keys.Space)
                 {
                     TogglePlay(!Playing);
+                }
+                else if (e.Modifiers == Keys.Control && e.KeyCode == Keys.S)
+                {
+                    SaveRatings();
                 }
             }
             catch (Exception ex)
@@ -218,9 +226,7 @@ namespace MusicSorter
         {
             try
             {
-                Rater.SaveSongRatings();
-                Rater.SongsRatingsUpdated = false;
-                DisplayResponseMessage("Saved!");
+                SaveRatings();
             }
             catch (Exception ex)
             {
@@ -372,7 +378,7 @@ namespace MusicSorter
                     }
                     return;
                 }
-                TogglePlay(false, true);
+                TogglePlay();
             }
             catch (NullReferenceException)
             {
@@ -640,7 +646,12 @@ namespace MusicSorter
             }
         }
 
-        private void TogglePlay(bool play, bool changeUIOnly = false)
+        private void TogglePlay()
+        {
+            TogglePlay(OutputDevice.PlaybackState == PlaybackState.Playing);
+        }
+
+        private void TogglePlay(bool play)
         {
             Playing = play;
 
@@ -651,12 +662,12 @@ namespace MusicSorter
                 if (Playing)
                 {
                     buttonPlay.Text = "||";
-                    if (!changeUIOnly) { OutputDevice.Play(); }
+                    OutputDevice.Play();
                 }
                 else
                 {
                     buttonPlay.Text = ">";
-                    if (!changeUIOnly) { OutputDevice.Stop(); }
+                    OutputDevice.Stop();
                 }
             }
         }
@@ -666,7 +677,6 @@ namespace MusicSorter
         {
             var segment = AudioFile.Length / 10;
             AudioFile.Position = segment * i;
-            TogglePlay(true);
         }
 
         private void SkipSongPosition(int i)
@@ -723,6 +733,13 @@ namespace MusicSorter
             labelTotalTime.ForeColor = new System.Drawing.Color();
             Trimmer.ResetTrimmer();
             buttonTrim.Text = "Trim";
+        }
+
+        private void SaveRatings()
+        {
+            Rater.SaveSongRatings();
+            Rater.SongsRatingsUpdated = false;
+            DisplayResponseMessage("Saved!");
         }
         #endregion
 

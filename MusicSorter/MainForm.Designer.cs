@@ -250,11 +250,11 @@
             this.buttonMode.UseVisualStyleBackColor = true;
             this.buttonMode.Click += new System.EventHandler(this.buttonMode_Click);
             // 
-            // buttonAudioTrimmer
+            // buttonTrim
             // 
             this.buttonTrim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonTrim.Location = new System.Drawing.Point(218, 812);
-            this.buttonTrim.Name = "buttonAudioTrimmer";
+            this.buttonTrim.Name = "buttonTrim";
             this.buttonTrim.Size = new System.Drawing.Size(97, 32);
             this.buttonTrim.TabIndex = 18;
             this.buttonTrim.TabStop = false;
