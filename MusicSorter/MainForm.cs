@@ -27,6 +27,7 @@ namespace MusicSorter
         private Timer SongTimer { get; set; } = new Timer();
         private SongRater Rater { get; set; }
         private SongTrimmer Trimmer { get; set; } = new SongTrimmer();
+        private List<string> DuplicateSongs { get; set; }
 
 
         private int AcceptableRating = 5; //changeable values in future
@@ -238,23 +239,21 @@ namespace MusicSorter
         {
             try
             {
+                DisposeCurrentSong();
+
                 for (int i = 0; i < listViewSongs.Items.Count; i++)
                 {
-                    var formattedName = GetFormattedName(listViewSongs.Items[i].Text);
-                    if (Rater.SongRatings.ContainsKey(formattedName)
-                        && Rater.SongRatings[formattedName] < AcceptableRating)
+                    var songName = listViewSongs.Items[i].Text;
+                    var formattedName = GetFormattedName(songName);
+                    if (Rater.SongRatings.ContainsKey(formattedName) &&
+                        (Rater.SongRatings[formattedName] < AcceptableRating || DuplicateSongs.Contains(songName)))                       
                     {
-                        var selectedSong = listViewSongs.Items[i].Text;
-                        var fileLocation = Path.Combine(textBoxMusicFolder.Text, selectedSong);
-                        if (File.Exists(fileLocation))
-                        {
-                            NextSong();
-                            FileSystem.DeleteFile(fileLocation, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                        }
+                        DeleteSong(songName);
                     }
                 }
 
                 DisplayResponseMessage("Filtered!");
+                NextSong();
             }
             catch (Exception ex)
             {
@@ -344,17 +343,26 @@ namespace MusicSorter
 
         private void SongTimer_Tick(object sender, EventArgs e)
         {
-            if (AudioFile != null && AudioFile.CurrentTime != null)
+            try
             {
-                if (Trimmer.IsTrimming && Trimmer.StartTime != null)
+                if (AudioFile != null && AudioFile.CurrentTime != null)
                 {
-                    labelTotalTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                    if (Trimmer.IsTrimming && Trimmer.StartTime != null)
+                    {
+                        labelTotalTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                    }
+                    else
+                    {
+                        labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
+                    }
+                    trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
                 }
-                else
-                {
-                    labelCurrentTime.Text = AudioFile.CurrentTime.ToString("hh\\:mm\\:ss");
-                }
-                trackBarSong.Value = (int)AudioFile.CurrentTime.TotalSeconds;
+            }
+            catch (NullReferenceException)
+            {
+                //do nothing
+                //audiofile null exception in currenttime when disposing audiofile
+                //will throw anytime access tried, even if just check if null
             }
         }
 
@@ -362,21 +370,24 @@ namespace MusicSorter
         {
             try
             {
-                var formattedName = GetFormattedName(CurrentSong);
-                if (AudioFile.Position == AudioFile.Length && //when song finished
-                    (Mode != PlaybackMode.PlaybackSorting
-                    || (Mode == PlaybackMode.PlaybackSorting && Rater.SongRatings.ContainsKey(formattedName))))
+                if (AudioFile != null && OutputDevice != null)
                 {
-                    if (Mode == PlaybackMode.Loop)
+                    var formattedName = GetFormattedName(CurrentSong);
+                    if (AudioFile.Position == AudioFile.Length && //when song finished
+                        (Mode != PlaybackMode.PlaybackSorting
+                        || (Mode == PlaybackMode.PlaybackSorting && Rater.SongRatings.ContainsKey(formattedName))))
                     {
-                        AudioFile.Position = 0;
-                        TogglePlay(true);
+                        if (Mode == PlaybackMode.Loop)
+                        {
+                            AudioFile.Position = 0;
+                            TogglePlay(true);
+                        }
+                        else
+                        {
+                            NextSong();
+                        }
+                        return;
                     }
-                    else
-                    {
-                        NextSong();
-                    }
-                    return;
                 }
                 TogglePlay();
             }
@@ -515,6 +526,8 @@ namespace MusicSorter
                     listViewSongs.Items.Add(Path.GetFileName(file));
                 }
 
+                HashSet<string> songs = new HashSet<string>();
+                DuplicateSongs = new List<string>();
                 for (int i = 0; i < listViewSongs.Items.Count; i++)
                 {
                     var songFileName = listViewSongs.Items[i].Text;
@@ -531,6 +544,16 @@ namespace MusicSorter
                     {
                         UpdateColor(i, Color.OrangeRed);
                     }
+
+                    if (!songs.Contains(formattedName))
+                    {
+                        songs.Add(formattedName);
+                    }
+                    else
+                    {
+                        DuplicateSongs.Add(songFileName);
+                        UpdateColor(i, Color.LightBlue);
+                    }
                 }
 
                 //find first acceptable song
@@ -545,6 +568,36 @@ namespace MusicSorter
                     }
                 }
             }
+        }
+
+        private void DeleteSong(string songName)
+        {
+            var fileLocation = GetSongFileLocation(songName);
+            if (File.Exists(fileLocation))
+            {
+                FileSystem.DeleteFile(fileLocation, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+            }
+        }
+
+        private void DisposeCurrentSong()
+        {
+            SongTimer.Enabled = false;
+
+            if (OutputDevice != null)
+            {
+                OutputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
+                OutputDevice.Dispose();
+            }
+            if (AudioFile != null)
+            {
+                AudioFile.Dispose();
+            }
+
+            pictureBoxAlbumArt.Image = null;
+            textBoxCurrentSong.Text = string.Empty;
+            CurrentSong = string.Empty;
+
+            SongTimer.Enabled = true;
         }
 
         private string GetFormattedName(string songFileName)
@@ -582,8 +635,6 @@ namespace MusicSorter
             var fileLocation = GetSongFileLocation(selectedSong);
             if (string.IsNullOrWhiteSpace(fileLocation) || Trimmer.IsTrimming) return;
 
-            textBoxCurrentSong.Text = selectedSong;
-
             if (Path.GetExtension(selectedSong).ToLower() == ".mp4")
             {
                 buttonTrim.Text = "Convert";
@@ -595,14 +646,7 @@ namespace MusicSorter
 
             try
             {
-                if (OutputDevice != null)
-                {
-                    OutputDevice.Dispose();
-                }
-                if (AudioFile != null)
-                {
-                    AudioFile.Dispose();
-                }
+                DisposeCurrentSong();
 
                 AudioFile = new AudioFileReader(fileLocation);
                 OutputDevice = new WaveOutEvent();
@@ -612,6 +656,7 @@ namespace MusicSorter
 
                 OutputDevice.Init(AudioFile);
                 OutputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+                textBoxCurrentSong.Text = selectedSong;
                 CurrentSong = selectedSong;
 
                 var file = TagLib.File.Create(fileLocation);
@@ -648,7 +693,14 @@ namespace MusicSorter
 
         private void TogglePlay()
         {
-            TogglePlay(OutputDevice.PlaybackState == PlaybackState.Playing);
+            if (OutputDevice != null)
+            {
+                TogglePlay(OutputDevice.PlaybackState == PlaybackState.Playing);
+            }
+            else
+            {
+                buttonPlay.Text = ">";
+            }
         }
 
         private void TogglePlay(bool play)
