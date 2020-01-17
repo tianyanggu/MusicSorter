@@ -36,6 +36,7 @@ namespace MusicSorter
 
         //TODO adjust mp3 volume when converting mp3 to mp3 or mp4 to mp3
         //TODO volume bar
+        //TODO move/save settings to xml file
 
         public MainForm(string[] args)
         {
@@ -53,21 +54,26 @@ namespace MusicSorter
             {
                 Rater = new SongRater();
 
-                textBoxMusicFolder.Text = Rater.PreviousFolder;
-                PopulateSongs(textBoxMusicFolder.Text);
-
-                var pipeListener = new NamedPipeListener<String>(); // instantiate an instance
-                pipeListener.MessageReceived += PipeListener_MessageReceived;
-                pipeListener.Error += (errSender, eventArgs) => MessageBox.Show($"Error ({eventArgs.ErrorType}): {eventArgs.Exception.Message}");
-                pipeListener.Start(); // when you're ready, start listening
-
                 //cannot instantiate new timer when ui not rendered (e.g. behind a window)
                 //just have it constantly tick instead
                 SongTimer.Interval = 1000;
                 SongTimer.Tick += SongTimer_Tick;
                 SongTimer.Enabled = true;
 
-                LoadStartupSong(StartUpSong);
+                if (string.IsNullOrWhiteSpace(StartUpSong))
+                {
+                    textBoxMusicFolder.Text = Rater.PreviousFolder;
+                    PopulateSongs(textBoxMusicFolder.Text);
+                }
+                else
+                {
+                    LoadStartupSong(StartUpSong);
+                }
+
+                var pipeListener = new NamedPipeListener<String>(); // instantiate an instance
+                pipeListener.MessageReceived += PipeListener_MessageReceived;
+                pipeListener.Error += (errSender, eventArgs) => MessageBox.Show($"Error ({eventArgs.ErrorType}): {eventArgs.Exception.Message}");
+                pipeListener.Start(); // when you're ready, start listening
             }
             catch (Exception ex)
             {
