@@ -9,9 +9,10 @@ namespace MusicSorter.Constants
     public enum PlaybackMode
     {
         Normal,
+        Gold,
+        Loop,
         FastSorting,
-        PlaybackSorting,
-        Loop
+        PlaybackSorting
     }
 
     public static class SorterConstants

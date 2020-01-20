@@ -14,13 +14,14 @@ using MusicSorter.Helpers;
 using MusicSorter.Forms;
 using MusicSorter.Constants;
 using static MusicSorter.Helpers.InterprocessPipe;
+using MetroFramework.Forms;
 
 namespace MusicSorter
 {
-    public partial class MainForm : Form
+    public partial class MainForm : MetroForm
     {
         private bool Playing { get; set; }
-        private PlaybackMode Mode { get; set; } = PlaybackMode.FastSorting;
+        private PlaybackMode Mode { get; set; }
         private string CurrentSong { get; set; }
         private WaveOutEvent OutputDevice { get; set; }
         private AudioFileReader AudioFile { get; set; }
@@ -74,6 +75,10 @@ namespace MusicSorter
                 pipeListener.MessageReceived += PipeListener_MessageReceived;
                 pipeListener.Error += (errSender, eventArgs) => MessageBox.Show($"Error ({eventArgs.ErrorType}): {eventArgs.Exception.Message}");
                 pipeListener.Start(); // when you're ready, start listening
+
+                //TODO get saved mode
+                Mode = PlaybackMode.Normal;
+                buttonMode.Text = "Normal";
             }
             catch (Exception ex)
             {
@@ -318,27 +323,53 @@ namespace MusicSorter
         }
         private void buttonMode_Click(object sender, EventArgs e)
         {
-            if (Mode == PlaybackMode.FastSorting)
+            if (sortingToggle.Checked)
             {
-                Mode = PlaybackMode.Normal;
-                buttonMode.Text = "Playback";
+                if (Mode == PlaybackMode.FastSorting)
+                {
+                    Mode = PlaybackMode.PlaybackSorting;
+                    buttonMode.Text = "Playback Sort";
+                }
+                else if (Mode == PlaybackMode.PlaybackSorting)
+                {
+                    Mode = PlaybackMode.FastSorting;
+                    buttonMode.Text = "Fast Sort";
+                }
             }
-            else if (Mode == PlaybackMode.Normal)
+            else
+            {
+                if (Mode == PlaybackMode.Loop)
+                {
+                    Mode = PlaybackMode.Normal;
+                    buttonMode.Text = "Normal";
+                }
+                else if (Mode == PlaybackMode.Normal)
+                {
+                    Mode = PlaybackMode.Gold;
+                    buttonMode.Text = "Gold Play";
+                }
+                else if (Mode == PlaybackMode.Gold)
+                {
+                    Mode = PlaybackMode.Loop;
+                    buttonMode.Text = "Loop";
+                }
+            }
+        }
+
+        private void sortingToggle_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sortingToggle.Checked)
             {
                 Mode = PlaybackMode.PlaybackSorting;
                 buttonMode.Text = "Playback Sort";
             }
-            else if (Mode == PlaybackMode.PlaybackSorting)
-            {
-                Mode = PlaybackMode.Loop;
-                buttonMode.Text = "Loop";
-            }
             else
             {
-                Mode = PlaybackMode.FastSorting;
-                buttonMode.Text = "Fast Sort";
+                Mode = PlaybackMode.Normal;
+                buttonMode.Text = "Normal";
             }
         }
+
         private void trackBarSong_MouseDown(object sender, MouseEventArgs e)
         {
             var percent = Decimal.Divide(e.X, trackBarSong.Width);
@@ -773,6 +804,7 @@ namespace MusicSorter
 
         private bool LoadAcceptableSong(int i)
         {
+            //TODO gold playback, and move all playback mode logic here
             var songName = listViewSongs.Items[i].Text;
             var formattedName = GetFormattedName(songName);
             var ext = Path.GetExtension(songName).ToLower().Trim();
