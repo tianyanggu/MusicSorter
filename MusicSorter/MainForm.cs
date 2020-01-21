@@ -804,11 +804,13 @@ namespace MusicSorter
 
         private bool LoadAcceptableSong(int i)
         {
-            //TODO gold playback, and move all playback mode logic here
             var songName = listViewSongs.Items[i].Text;
             var formattedName = GetFormattedName(songName);
             var ext = Path.GetExtension(songName).ToLower().Trim();
-            if ((!Rater.SongRatings.ContainsKey(formattedName) || Rater.SongRatings[formattedName] >= AcceptableRating)
+            //if great rating in gold playback
+            //or if not rated or acceptable rating
+            if ((Mode != PlaybackMode.Gold || (Rater.SongRatings.ContainsKey(formattedName) && Rater.SongRatings[formattedName] >= GreatRating))
+                && (!Rater.SongRatings.ContainsKey(formattedName) || Rater.SongRatings[formattedName] >= AcceptableRating)
                 && SorterConstants.SupportedExtensions.Contains(ext))
             {
                 listViewSongs.Items[i].Selected = true; //event takes care of loading
