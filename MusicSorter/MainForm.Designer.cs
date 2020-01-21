@@ -51,6 +51,8 @@
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
             this.metroTabPage1 = new MetroFramework.Controls.MetroTabPage();
             this.metroTabPage2 = new MetroFramework.Controls.MetroTabPage();
+            this.buttonTrimCancel = new MetroFramework.Controls.MetroButton();
+            this.buttonConvert = new MetroFramework.Controls.MetroButton();
             this.groupBoxSongList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).BeginInit();
             this.metroTabControl1.SuspendLayout();
@@ -234,7 +236,7 @@
             // 
             this.buttonTrim.Location = new System.Drawing.Point(7, 45);
             this.buttonTrim.Name = "buttonTrim";
-            this.buttonTrim.Size = new System.Drawing.Size(75, 23);
+            this.buttonTrim.Size = new System.Drawing.Size(102, 23);
             this.buttonTrim.TabIndex = 18;
             this.buttonTrim.TabStop = false;
             this.buttonTrim.Text = "Trim";
@@ -307,6 +309,8 @@
             // 
             // metroTabPage2
             // 
+            this.metroTabPage2.Controls.Add(this.buttonTrimCancel);
+            this.metroTabPage2.Controls.Add(this.buttonConvert);
             this.metroTabPage2.Controls.Add(this.buttonHelp);
             this.metroTabPage2.Controls.Add(this.buttonTrim);
             this.metroTabPage2.HorizontalScrollbarBarColor = true;
@@ -320,6 +324,29 @@
             this.metroTabPage2.VerticalScrollbarBarColor = true;
             this.metroTabPage2.VerticalScrollbarHighlightOnWheel = false;
             this.metroTabPage2.VerticalScrollbarSize = 10;
+            // 
+            // buttonTrimCancel
+            // 
+            this.buttonTrimCancel.Location = new System.Drawing.Point(115, 45);
+            this.buttonTrimCancel.Name = "buttonTrimCancel";
+            this.buttonTrimCancel.Size = new System.Drawing.Size(75, 23);
+            this.buttonTrimCancel.TabIndex = 20;
+            this.buttonTrimCancel.TabStop = false;
+            this.buttonTrimCancel.Text = "Cancel";
+            this.buttonTrimCancel.UseSelectable = true;
+            this.buttonTrimCancel.Visible = false;
+            this.buttonTrimCancel.Click += new System.EventHandler(this.buttonTrimCancel_Click);
+            // 
+            // buttonConvert
+            // 
+            this.buttonConvert.Location = new System.Drawing.Point(7, 74);
+            this.buttonConvert.Name = "buttonConvert";
+            this.buttonConvert.Size = new System.Drawing.Size(102, 23);
+            this.buttonConvert.TabIndex = 19;
+            this.buttonConvert.TabStop = false;
+            this.buttonConvert.Text = "Convert";
+            this.buttonConvert.UseSelectable = true;
+            this.buttonConvert.Click += new System.EventHandler(this.buttonConvert_Click);
             // 
             // MainForm
             // 
@@ -381,6 +408,8 @@
         private MetroFramework.Controls.MetroTabControl metroTabControl1;
         private MetroFramework.Controls.MetroTabPage metroTabPage1;
         private MetroFramework.Controls.MetroTabPage metroTabPage2;
+        private MetroFramework.Controls.MetroButton buttonConvert;
+        private MetroFramework.Controls.MetroButton buttonTrimCancel;
     }
 }
 
