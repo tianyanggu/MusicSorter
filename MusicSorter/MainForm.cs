@@ -205,6 +205,11 @@ namespace MusicSorter
             }
         }
 
+        private void trackBarSong_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.SuppressKeyPress = true;
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
@@ -482,6 +487,33 @@ namespace MusicSorter
                 MessageBox.Show($"Conversion Failed: {ex.Message}");
             }
         }
+
+        private void buttonGoldBrowse_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                FolderBrowserDialog fd = new FolderBrowserDialog();
+                var dr = fd.ShowDialog();
+                if (dr == DialogResult.OK)
+                {
+                    textBoxGoldFolder.Text = fd.SelectedPath;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void buttonGoldCopy_Click(object sender, EventArgs e)
+        {
+            MoveGoldSongs(true);
+        }
+
+        private void buttonGoldMove_Click(object sender, EventArgs e)
+        {
+            MoveGoldSongs(false);
+        }
         #endregion
 
         #region private methods
@@ -593,7 +625,7 @@ namespace MusicSorter
                 }
 
                 //find first acceptable song
-                if (listViewSongs.Items.Count > 0 && loadSong)
+                if (loadSong)
                 {
                     for (int i = 0; i < listViewSongs.Items.Count; i++)
                     {
@@ -825,6 +857,40 @@ namespace MusicSorter
             Rater.SaveSongRatings();
             Rater.SongsRatingsUpdated = false;
             DisplayResponseMessage("Saved!");
+        }
+
+        private void MoveGoldSongs(bool copyFiles)
+        {
+            if (Directory.Exists(textBoxGoldFolder.Text))
+            {
+                if (!copyFiles) { DisposeCurrentSong(); } 
+
+                for (int i = 0; i < listViewSongs.Items.Count; i++)
+                {
+                    var songName = listViewSongs.Items[i].Text;
+                    var formattedName = GetFormattedName(songName);
+                    if (Rater.SongRatings.ContainsKey(formattedName)
+                        && Rater.SongRatings[formattedName] >= GreatRating)
+                    {
+                        var songFileLocation = GetSongFileLocation(songName);
+                        if (copyFiles)
+                        {
+                            File.Copy(songFileLocation, Path.Combine(textBoxGoldFolder.Text, songName));
+                        }
+                        else
+                        {
+                            File.Move(songFileLocation, Path.Combine(textBoxGoldFolder.Text, songName));
+                        }
+                    }
+                }
+
+                textBoxMusicFolder.Text = textBoxGoldFolder.Text;
+                PopulateSongs(textBoxGoldFolder.Text);
+            }
+            else
+            {
+                MessageBox.Show("Directory does not exist.");
+            }
         }
         #endregion
 
