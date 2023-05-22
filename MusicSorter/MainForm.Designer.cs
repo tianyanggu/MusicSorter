@@ -51,13 +51,13 @@
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
             this.metroTabPage1 = new MetroFramework.Controls.MetroTabPage();
             this.metroTabPage2 = new MetroFramework.Controls.MetroTabPage();
+            this.textBoxGoldFolder = new System.Windows.Forms.TextBox();
+            this.buttonGoldBrowse = new MetroFramework.Controls.MetroButton();
+            this.label1 = new System.Windows.Forms.Label();
+            this.buttonGoldCopy = new MetroFramework.Controls.MetroButton();
+            this.buttonGoldMove = new MetroFramework.Controls.MetroButton();
             this.buttonTrimCancel = new MetroFramework.Controls.MetroButton();
             this.buttonConvert = new MetroFramework.Controls.MetroButton();
-            this.buttonGoldMove = new MetroFramework.Controls.MetroButton();
-            this.buttonGoldCopy = new MetroFramework.Controls.MetroButton();
-            this.label1 = new System.Windows.Forms.Label();
-            this.buttonGoldBrowse = new MetroFramework.Controls.MetroButton();
-            this.textBoxGoldFolder = new System.Windows.Forms.TextBox();
             this.groupBoxSongList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbumArt)).BeginInit();
             this.metroTabControl1.SuspendLayout();
@@ -337,6 +337,56 @@
             this.metroTabPage2.VerticalScrollbarHighlightOnWheel = false;
             this.metroTabPage2.VerticalScrollbarSize = 10;
             // 
+            // textBoxGoldFolder
+            // 
+            this.textBoxGoldFolder.Location = new System.Drawing.Point(277, 73);
+            this.textBoxGoldFolder.Name = "textBoxGoldFolder";
+            this.textBoxGoldFolder.Size = new System.Drawing.Size(156, 26);
+            this.textBoxGoldFolder.TabIndex = 27;
+            // 
+            // buttonGoldBrowse
+            // 
+            this.buttonGoldBrowse.Location = new System.Drawing.Point(439, 74);
+            this.buttonGoldBrowse.Name = "buttonGoldBrowse";
+            this.buttonGoldBrowse.Size = new System.Drawing.Size(102, 23);
+            this.buttonGoldBrowse.TabIndex = 26;
+            this.buttonGoldBrowse.TabStop = false;
+            this.buttonGoldBrowse.Text = "Browse...";
+            this.buttonGoldBrowse.UseSelectable = true;
+            this.buttonGoldBrowse.Click += new System.EventHandler(this.buttonGoldBrowse_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label1.Location = new System.Drawing.Point(12, 76);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(93, 20);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "Gold Songs";
+            // 
+            // buttonGoldCopy
+            // 
+            this.buttonGoldCopy.Location = new System.Drawing.Point(115, 74);
+            this.buttonGoldCopy.Name = "buttonGoldCopy";
+            this.buttonGoldCopy.Size = new System.Drawing.Size(75, 23);
+            this.buttonGoldCopy.TabIndex = 23;
+            this.buttonGoldCopy.TabStop = false;
+            this.buttonGoldCopy.Text = "Copy";
+            this.buttonGoldCopy.UseSelectable = true;
+            this.buttonGoldCopy.Click += new System.EventHandler(this.buttonGoldCopy_Click);
+            // 
+            // buttonGoldMove
+            // 
+            this.buttonGoldMove.Location = new System.Drawing.Point(196, 74);
+            this.buttonGoldMove.Name = "buttonGoldMove";
+            this.buttonGoldMove.Size = new System.Drawing.Size(75, 23);
+            this.buttonGoldMove.TabIndex = 22;
+            this.buttonGoldMove.TabStop = false;
+            this.buttonGoldMove.Text = "Move";
+            this.buttonGoldMove.UseSelectable = true;
+            this.buttonGoldMove.Click += new System.EventHandler(this.buttonGoldMove_Click);
+            // 
             // buttonTrimCancel
             // 
             this.buttonTrimCancel.Location = new System.Drawing.Point(115, 16);
@@ -360,60 +410,9 @@
             this.buttonConvert.UseSelectable = true;
             this.buttonConvert.Click += new System.EventHandler(this.buttonConvert_Click);
             // 
-            // buttonGoldMove
-            // 
-            this.buttonGoldMove.Location = new System.Drawing.Point(196, 74);
-            this.buttonGoldMove.Name = "buttonGoldMove";
-            this.buttonGoldMove.Size = new System.Drawing.Size(75, 23);
-            this.buttonGoldMove.TabIndex = 22;
-            this.buttonGoldMove.TabStop = false;
-            this.buttonGoldMove.Text = "Move";
-            this.buttonGoldMove.UseSelectable = true;
-            this.buttonGoldMove.Click += new System.EventHandler(this.buttonGoldMove_Click);
-            // 
-            // buttonGoldCopy
-            // 
-            this.buttonGoldCopy.Location = new System.Drawing.Point(115, 74);
-            this.buttonGoldCopy.Name = "buttonGoldCopy";
-            this.buttonGoldCopy.Size = new System.Drawing.Size(75, 23);
-            this.buttonGoldCopy.TabIndex = 23;
-            this.buttonGoldCopy.TabStop = false;
-            this.buttonGoldCopy.Text = "Copy";
-            this.buttonGoldCopy.UseSelectable = true;
-            this.buttonGoldCopy.Click += new System.EventHandler(this.buttonGoldCopy_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label1.Location = new System.Drawing.Point(12, 76);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 20);
-            this.label1.TabIndex = 24;
-            this.label1.Text = "Gold Songs";
-            // 
-            // buttonGoldBrowse
-            // 
-            this.buttonGoldBrowse.Location = new System.Drawing.Point(439, 74);
-            this.buttonGoldBrowse.Name = "buttonGoldBrowse";
-            this.buttonGoldBrowse.Size = new System.Drawing.Size(102, 23);
-            this.buttonGoldBrowse.TabIndex = 26;
-            this.buttonGoldBrowse.TabStop = false;
-            this.buttonGoldBrowse.Text = "Browse...";
-            this.buttonGoldBrowse.UseSelectable = true;
-            this.buttonGoldBrowse.Click += new System.EventHandler(this.buttonGoldBrowse_Click);
-            // 
-            // textBoxGoldFolder
-            // 
-            this.textBoxGoldFolder.Location = new System.Drawing.Point(277, 73);
-            this.textBoxGoldFolder.Name = "textBoxGoldFolder";
-            this.textBoxGoldFolder.Size = new System.Drawing.Size(156, 26);
-            this.textBoxGoldFolder.TabIndex = 27;
-            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1517, 856);
             this.Controls.Add(this.metroTabControl1);
             this.Controls.Add(this.sortingToggle);
