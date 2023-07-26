@@ -10,8 +10,10 @@ namespace MusicSorter.Helpers
 {
     public class SongRater
     {
-        private static readonly string FilterFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SongRatings.txt");
-        private static readonly string BackupFilterFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SongRatings_Backup.txt");
+        private static readonly string DataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments);
+        private static readonly string SongRaterFolder = Path.Combine(DataFolder, "SongRater");
+        private static readonly string FilterFileName = Path.Combine(SongRaterFolder, "SongRatings.txt");
+        private static readonly string BackupFilterFileName = Path.Combine(SongRaterFolder, "SongRatings_Backup.txt");
 
         public Dictionary<string, int> SongRatings { get; } = new Dictionary<string, int>();
         public bool SongsRatingsUpdated { get; set; } = false;
@@ -59,6 +61,10 @@ namespace MusicSorter.Helpers
             {
                 File.Copy(FilterFileName, BackupFilterFileName, true);
             }
+            else if (!Directory.Exists(SongRaterFolder))
+            {
+                Directory.CreateDirectory(SongRaterFolder);
+            }
 
             using (StreamWriter writer = new StreamWriter(FilterFileName, false))
             {
@@ -104,7 +110,11 @@ namespace MusicSorter.Helpers
         /// </summary>
         /// <param name="artistName"></param>
         /// <param name="songName"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// Returns in format artist name - song name.
+        /// Returns artistName if songName is empty. 
+        /// Returns songName if fails to find artist in songName.
+        /// </returns>
         public string FormatSongName(string artistName, string songName)
         {
             string formattedArtist = artistName.Trim();
@@ -113,7 +123,7 @@ namespace MusicSorter.Helpers
 
             if (string.IsNullOrWhiteSpace(songName))
             {
-                return string.Empty;
+                return artistName;
             }
             else
             {
@@ -127,7 +137,7 @@ namespace MusicSorter.Helpers
 
                     if (hyphenIndexes.Count == 0 || hyphenIndexes.Count > 2)
                     {
-                        return string.Empty;
+                        return songName;
                     }
 
                     int startPos = 0;
@@ -144,13 +154,13 @@ namespace MusicSorter.Helpers
                         }
                         else
                         {
-                            return string.Empty;
+                            return songName;
                         }
                     }
 
                     var length = hyphenPos - startPos;
                     var songNamePos = hyphenPos + 1;
-                    if (hyphenPos + 1 >= songName.Length) return string.Empty;
+                    if (hyphenPos + 1 >= songName.Length) return songName;
 
                     formattedArtist = songName.Substring(startPos, length).Trim();
                     formattedSong = songName.Substring(songNamePos).Trim();
@@ -160,7 +170,7 @@ namespace MusicSorter.Helpers
 
                     if (string.IsNullOrWhiteSpace(formattedArtist) || string.IsNullOrWhiteSpace(formattedSong))
                     {
-                        return string.Empty;
+                        return songName;
                     }
                 }
             }

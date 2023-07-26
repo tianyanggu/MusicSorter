@@ -114,7 +114,7 @@
             // 
             this.textBoxMusicFolder.Location = new System.Drawing.Point(6, 25);
             this.textBoxMusicFolder.Name = "textBoxMusicFolder";
-            this.textBoxMusicFolder.Size = new System.Drawing.Size(269, 26);
+            this.textBoxMusicFolder.Size = new System.Drawing.Size(269, 20);
             this.textBoxMusicFolder.TabIndex = 1;
             this.textBoxMusicFolder.TabStop = false;
             this.textBoxMusicFolder.Leave += new System.EventHandler(this.textBoxMusicFolder_Leave);
@@ -152,7 +152,7 @@
             this.listViewSongs.Location = new System.Drawing.Point(6, 57);
             this.listViewSongs.MultiSelect = false;
             this.listViewSongs.Name = "listViewSongs";
-            this.listViewSongs.Size = new System.Drawing.Size(393, 741);
+            this.listViewSongs.Size = new System.Drawing.Size(387, 735);
             this.listViewSongs.TabIndex = 5;
             this.listViewSongs.TabStop = false;
             this.listViewSongs.UseCompatibleStateImageBehavior = false;
@@ -167,7 +167,7 @@
             this.textBoxCurrentSong.Location = new System.Drawing.Point(212, 741);
             this.textBoxCurrentSong.Name = "textBoxCurrentSong";
             this.textBoxCurrentSong.ReadOnly = true;
-            this.textBoxCurrentSong.Size = new System.Drawing.Size(688, 26);
+            this.textBoxCurrentSong.Size = new System.Drawing.Size(688, 20);
             this.textBoxCurrentSong.TabIndex = 6;
             this.textBoxCurrentSong.TabStop = false;
             // 
@@ -179,7 +179,7 @@
             this.pictureBoxAlbumArt.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.pictureBoxAlbumArt.Location = new System.Drawing.Point(3, 3);
             this.pictureBoxAlbumArt.Name = "pictureBoxAlbumArt";
-            this.pictureBoxAlbumArt.Size = new System.Drawing.Size(1074, 678);
+            this.pictureBoxAlbumArt.Size = new System.Drawing.Size(1074, 672);
             this.pictureBoxAlbumArt.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxAlbumArt.TabIndex = 7;
             this.pictureBoxAlbumArt.TabStop = false;
@@ -277,9 +277,9 @@
             this.sortingToggle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.sortingToggle.AutoSize = true;
             this.sortingToggle.DisplayStatus = false;
-            this.sortingToggle.Location = new System.Drawing.Point(910, 821);
+            this.sortingToggle.Location = new System.Drawing.Point(910, 828);
             this.sortingToggle.Name = "sortingToggle";
-            this.sortingToggle.Size = new System.Drawing.Size(50, 24);
+            this.sortingToggle.Size = new System.Drawing.Size(50, 17);
             this.sortingToggle.TabIndex = 22;
             this.sortingToggle.Text = "Off";
             this.sortingToggle.UseSelectable = true;
@@ -341,7 +341,7 @@
             // 
             this.textBoxGoldFolder.Location = new System.Drawing.Point(277, 73);
             this.textBoxGoldFolder.Name = "textBoxGoldFolder";
-            this.textBoxGoldFolder.Size = new System.Drawing.Size(156, 26);
+            this.textBoxGoldFolder.Size = new System.Drawing.Size(156, 20);
             this.textBoxGoldFolder.TabIndex = 27;
             // 
             // buttonGoldBrowse
@@ -406,7 +406,7 @@
             this.buttonConvert.Size = new System.Drawing.Size(102, 23);
             this.buttonConvert.TabIndex = 19;
             this.buttonConvert.TabStop = false;
-            this.buttonConvert.Text = "Convert";
+            this.buttonConvert.Text = "Convert MP4";
             this.buttonConvert.UseSelectable = true;
             this.buttonConvert.Click += new System.EventHandler(this.buttonConvert_Click);
             // 

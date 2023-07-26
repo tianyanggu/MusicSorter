@@ -39,6 +39,7 @@ namespace MusicSorter.Constants
             ".m4v",
             ".mov",
             ".mp4",
+            ".mkv",
             ".sami",
             ".smi"
         };

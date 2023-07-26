@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MusicSorter")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("MusicSorter")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2019")]
+[assembly: AssemblyTitle("Music Sorter")]
+[assembly: AssemblyDescription("Plays and sorts music")]
+[assembly: AssemblyConfiguration("debug")]
+[assembly: AssemblyCompany("Tianyang")]
+[assembly: AssemblyProduct("Music Sorter")]
+[assembly: AssemblyCopyright("Copyright © Tianyang 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

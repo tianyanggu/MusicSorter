@@ -677,7 +677,8 @@ namespace MusicSorter
                 {
                     using (var file = TagLib.File.Create(songFileLocation))
                     {
-                        if (file.Tag.Performers.Length >= 1
+                        if (file.Tag.Performers != null
+                            && file.Tag.Performers.Length >= 1
                             && !string.IsNullOrWhiteSpace(file.Tag.Title))
                         {
                             var performers = file.Tag.Performers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
